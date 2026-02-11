@@ -6,16 +6,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
   </head>
   <body>
-    <h1>zzsGuesser!</h1>
-
-
+    
     <div class="number-guesser-section">
+      <h1>!zzsGuesser!</h1>
       <h2>Number Guessing Game (1-1000)</h2>
       <div class="game-container">
         <p id="gameStatus">Guess a number between 1 and 1000!</p>
+        <p id="conditionsStatus" class="conditions-status"></p>
         <div class="input-group">
           <input type="number" id="guessInput" min="1" max="1000" placeholder="Enter your guess">
           <button id="submitGuess">Guess</button>
+          <button id="applyConditions" aria-pressed="false" title="Toggle penalty rules for guesses that violate established higher/lower bounds">Apply Conditions: Off</button>
           <button id="newGame">New Game</button>
         </div>
         <div id="guessHistory" class="guess-history"></div>
@@ -34,27 +35,45 @@
     </div>
 <style>
   body {
-    background-color: gray;
-}
-h1 {
-    background-color: rgb(42, 2, 2);
-    color: blueviolet;
-}
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top, #1e3c72, #2a5298 40%, #000 100%);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #f5f5f5;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 20px 0 10px;
+    font-family: "Alfa Slab One", system-ui, sans-serif;
+    letter-spacing: 2px;
+    font-size: 40px;
+    color: #ffeb3b;
+    text-shadow: 0 0 10px rgba(255, 235, 59, 0.7), 0 0 25px rgba(255, 193, 7, 0.6);
+    animation: titleGlow 2.5s ease-in-out infinite alternate;
+  }
 
 /* Number Guessing Game Styles */
 .number-guesser-section {
     max-width: 600px;
-    margin: 20px auto;
+    margin: 20px auto 40px;
     padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.55));
+    border-radius: 18px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    animation: cardFloat 6s ease-in-out infinite;
 }
 
 .number-guesser-section h2 {
     text-align: center;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 20px;
+    font-weight: 600;
 }
 
 .game-container {
@@ -69,22 +88,39 @@ h1 {
     font-weight: bold;
     padding: 10px;
     border-radius: 5px;
-    background-color: #e3f2fd;
+    background-color: rgba(227, 242, 253, 0.9);
+    color: #0d47a1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 #gameStatus.success {
     background-color: #c8e6c9;
-    color: #2e7d32;
+    color: #1b5e20;
+    animation: pulseWin 0.8s ease-out 1;
 }
 
 #gameStatus.error {
     background-color: #ffcdd2;
     color: #c62828;
+    animation: shakeError 0.4s ease-in-out 1;
 }
 
 #gameStatus.hint {
     background-color: #fff3e0;
     color: #e65100;
+}
+
+.conditions-status {
+    text-align: center;
+    font-size: 12px;
+    color: #e0e0e0;
+    margin: -6px 0 4px 0;
+    font-style: oblique;
+}
+
+.conditions-status strong {
+    color: #333;
 }
 
 .input-group {
@@ -98,23 +134,29 @@ h1 {
     min-width: 150px;
     padding: 10px;
     font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    color: #ffffff;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
 }
 
 #guessInput:focus {
     outline: none;
     border-color: #4caf50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.4);
 }
 
 #submitGuess,
+#applyConditions,
 #newGame {
     padding: 10px 20px;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
 }
 
 #submitGuess {
@@ -124,11 +166,34 @@ h1 {
 
 #submitGuess:hover:not(:disabled) {
     background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
 }
 
 #submitGuess:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#applyConditions {
+    background-color: #6a1b9a;
+    color: white;
+}
+
+#applyConditions:hover {
+    background-color: #4a148c;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(106, 27, 154, 0.6);
+}
+
+#applyConditions.active {
+    background-color: #2e7d32;
+}
+
+#applyConditions.active:hover {
+    background-color: #1b5e20;
 }
 
 #newGame {
@@ -138,15 +203,18 @@ h1 {
 
 #newGame:hover {
     background-color: #0b7dda;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
 }
 
 .guess-history {
     padding: 10px;
-    background-color: white;
-    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
     min-height: 50px;
     max-height: 300px;
     overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .guess-history ul {
@@ -167,14 +235,15 @@ h1 {
 .active-guess-list li {
     margin: 8px 0;
     padding: 5px;
-    background-color: #f9f9f9;
-    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
 }
 
 .game-stats {
     text-align: center;
     font-size: 16px;
     font-weight: bold;
+    color: #f5f5f5;
 }
 
 .game-history-section {
@@ -185,7 +254,7 @@ h1 {
 
 .game-history-section h3 {
     margin-bottom: 10px;
-    color: #333;
+    color: #ffffff;
 }
 
 .history-buttons {
@@ -232,8 +301,10 @@ h1 {
     justify-content: space-around;
     margin-bottom: 15px;
     padding: 10px;
-    background-color: white;
-    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.45);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f5f5f5;
 }
 
 .history-stats p {
@@ -243,29 +314,30 @@ h1 {
 .history-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.55);
+    border-radius: 8px;
     overflow: hidden;
+    color: #e0e0e0;
 }
 
 .history-table thead {
-    background-color: #2196f3;
-    color: white;
+    background-color: rgba(33, 150, 243, 0.9);
+    color: #ffffff;
 }
 
 .history-table th,
 .history-table td {
     padding: 10px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .history-table tbody tr:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .history-table tbody tr.selected {
-    background-color: #e3f2fd !important;
+    background-color: rgba(227, 242, 253, 0.18) !important;
     font-weight: bold;
 }
 
@@ -276,25 +348,27 @@ h1 {
 .selected-game-guesses {
     margin-top: 15px;
     padding: 15px;
-    background-color: #fff;
-    border-radius: 5px;
-    border: 2px solid #2196f3;
+    background-color: rgba(0, 0, 0, 0.55);
+    border-radius: 10px;
+    border: 1px solid rgba(33, 150, 243, 0.6);
+    color: #f5f5f5;
 }
 
 .selected-game-header {
     margin-bottom: 15px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .selected-game-header h4 {
     margin: 0 0 10px 0;
-    color: #2196f3;
+    color: #64b5f6;
 }
 
 .selected-game-header p {
     margin: 5px 0;
     font-size: 14px;
+    color: #e0e0e0;
 }
 
 .selected-game-guess-list {
@@ -307,16 +381,18 @@ h1 {
     list-style-type: decimal;
     margin: 10px 0;
     padding-left: 25px;
-    background-color: #f9f9f9;
+    background-color: rgba(255, 255, 255, 0.04);
     padding: 10px 10px 10px 25px;
-    border-radius: 5px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .historical-guess-list li {
     margin: 8px 0;
     padding: 5px;
-    background-color: white;
-    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    color: #f5f5f5;
 }
 
 .more-guesses-note {
@@ -324,6 +400,48 @@ h1 {
     color: #666;
     font-style: italic;
     margin-top: 10px;
+}
+
+/* Fun animations */
+@keyframes titleGlow {
+  from {
+    text-shadow: 0 0 8px rgba(255, 235, 59, 0.6), 0 0 18px rgba(255, 193, 7, 0.5);
+    transform: translateY(0);
+  }
+  to {
+    text-shadow: 0 0 16px rgba(255, 235, 59, 0.9), 0 0 30px rgba(255, 193, 7, 0.9);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes cardFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulseWin {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shakeError {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
 }
 </style>
 
@@ -335,6 +453,10 @@ class NumberGuessingGame {
     this.targetNumber = null;
     this.guessCount = 0;
     this.guessHistory = [];
+    this.conditionsEnabled = false;
+    this.minAllowed = 1;
+    this.maxAllowed = 1000;
+    this.historyVisible = false;
     this.db = null;
     this.init();
   }
@@ -380,11 +502,41 @@ class NumberGuessingGame {
     this.targetNumber = Math.floor(Math.random() * 1000) + 1;
     this.guessCount = 0;
     this.guessHistory = [];
+    this.minAllowed = 1;
+    this.maxAllowed = 1000;
     this.updateUI();
+    this.updateConditionsStatus();
     document.getElementById('guessInput').value = '';
     document.getElementById('guessInput').disabled = false;
     document.getElementById('submitGuess').disabled = false;
     console.log('New game started. Target number:', this.targetNumber);
+  }
+
+  updateConditionsStatus() {
+    const el = document.getElementById('conditionsStatus');
+    const input = document.getElementById('guessInput');
+    if (!el || !input) return;
+
+    if (!this.conditionsEnabled) {
+      el.innerHTML = '<strong>Conditions:</strong> Off';
+      input.min = '1';
+      input.max = '1000';
+      return;
+    }
+
+    el.innerHTML = `<strong>Conditions:</strong> On | <strong>Allowed range:</strong> ${this.minAllowed}–${this.maxAllowed}`;
+    input.min = String(this.minAllowed);
+    input.max = String(this.maxAllowed);
+  }
+
+  setConditionsEnabled(enabled) {
+    this.conditionsEnabled = enabled;
+    const btn = document.getElementById('applyConditions');
+    if (!btn) return;
+    btn.classList.toggle('active', enabled);
+    btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+    btn.textContent = enabled ? 'Apply Conditions: On' : 'Apply Conditions: Off';
+    this.updateConditionsStatus();
   }
 
   // Handle guess submission
@@ -397,8 +549,41 @@ class NumberGuessingGame {
       return;
     }
 
-    // Check if this number has already been guessed
-    const alreadyGuessed = this.guessHistory.some(item => item.guess === guess);
+    // Apply "conditions" rule: if guess violates established bounds (from prior hints),
+    // apply a penalty guess and prompt the user to guess again without advancing state.
+    if (this.conditionsEnabled && (guess < this.minAllowed || guess > this.maxAllowed)) {
+      // Record the invalid attempt AND an additional penalty entry.
+      const attemptCount = this.guessHistory.length + 1;
+      this.guessHistory.push({
+        guess,
+        result: `Out of bounds (allowed ${this.minAllowed}–${this.maxAllowed}).`,
+        count: attemptCount,
+        isViolation: true
+      });
+
+      const penaltyCount = attemptCount + 1;
+      const message = "You've Been Penalized. Guess Again.";
+      this.guessHistory.push({
+        guess,
+        result: message,
+        count: penaltyCount,
+        isPenalty: true
+      });
+
+      this.guessCount = penaltyCount;
+      document.getElementById('guessCount').textContent = String(penaltyCount);
+
+      this.updateStatus(message, 'error');
+      this.updateGuessHistory();
+      this.updateConditionsStatus();
+
+      input.value = '';
+      input.focus();
+      return;
+    }
+
+    // Check if this number has already been guessed (ignore penalty attempts)
+    const alreadyGuessed = this.guessHistory.some(item => item.guess === guess && !item.isPenalty && !item.isViolation);
     if (alreadyGuessed) {
       this.updateStatus(`You've already guessed ${guess}! Try a different number.`, 'error');
       input.value = '';
@@ -406,30 +591,36 @@ class NumberGuessingGame {
       return;
     }
 
-    this.guessCount++;
+    const nextCount = this.guessHistory.length + 1;
+    this.guessCount = nextCount;
     // Update guess count display
-    document.getElementById('guessCount').textContent = this.guessCount;
+    document.getElementById('guessCount').textContent = String(nextCount);
     
     let message = '';
     let statusClass = '';
 
     if (guess === this.targetNumber) {
-      message = `🎉 Congratulations! You guessed it in ${this.guessCount} ${this.guessCount === 1 ? 'guess' : 'guesses'}!`;
+      message = `🎉 Congratulations! You guessed it in ${nextCount} ${nextCount === 1 ? 'guess' : 'guesses'}!`;
       statusClass = 'success';
       input.disabled = true;
       document.getElementById('submitGuess').disabled = true;
     } else if (guess < this.targetNumber) {
-      message = `Higher! (Guess #${this.guessCount})`;
+      message = `Higher! (Guess #${nextCount})`;
       statusClass = 'hint';
+      // Establish/strengthen the known lower bound for subsequent guesses
+      this.minAllowed = Math.max(this.minAllowed, guess + 1);
     } else {
-      message = `Lower! (Guess #${this.guessCount})`;
+      message = `Lower! (Guess #${nextCount})`;
       statusClass = 'hint';
+      // Establish/strengthen the known upper bound for subsequent guesses
+      this.maxAllowed = Math.min(this.maxAllowed, guess - 1);
     }
 
     // Add guess to history BEFORE saving (so final guess is included)
-    this.guessHistory.push({ guess, result: message, count: this.guessCount });
+    this.guessHistory.push({ guess, result: message, count: nextCount });
     this.updateStatus(message, statusClass);
     this.updateGuessHistory();
+    this.updateConditionsStatus();
     
     // Save game after adding the final guess to history
     if (guess === this.targetNumber) {
@@ -465,9 +656,14 @@ class NumberGuessingGame {
     // Show all guesses during active session, most recent first
     const allGuesses = [...this.guessHistory].reverse();
     historyEl.innerHTML = '<strong>All Guesses (Active Game):</strong><ul class="active-guess-list">' +
-      allGuesses.map(item => 
-        `<li>Guess #${item.count}: ${item.guess} - ${item.result.replace(/\(Guess #\d+\)/g, '').trim()}</li>`
-      ).join('') + '</ul>';
+      allGuesses.map(item => {
+        const flags = [
+          item.isPenalty ? 'Penalty' : null,
+          item.isViolation ? 'Violation' : null
+        ].filter(Boolean);
+        const flagLabel = flags.length ? ` (${flags.join(', ')})` : '';
+        return `<li>Guess #${item.count}: ${item.guess}${flagLabel} - ${item.result.replace(/\(Guess #\d+\)/g, '').trim()}</li>`;
+      }).join('') + '</ul>';
   }
 
   // Save game to IndexedDB
@@ -477,11 +673,17 @@ class NumberGuessingGame {
       return;
     }
 
+    // Persist penalties too (flagged via isPenalty)
+    const penaltyCount = this.guessHistory.filter(item => !!item.isPenalty).length;
+    // Make sure the saved guessCount reflects total attempts (including penalties)
+    const totalGuessCount = this.guessHistory.length;
     // Create a deep copy of guessHistory to ensure all data is saved
     const guessHistoryCopy = this.guessHistory.map(item => ({
       guess: item.guess,
       result: item.result,
-      count: item.count
+      count: item.count,
+      isPenalty: !!item.isPenalty,
+      isViolation: !!item.isViolation
     }));
 
     console.log('Saving game - guessCount:', this.guessCount);
@@ -491,7 +693,8 @@ class NumberGuessingGame {
 
     const gameData = {
       targetNumber: this.targetNumber,
-      guessCount: this.guessCount,
+      guessCount: totalGuessCount,
+      penaltyCount,
       timestamp: new Date().toISOString(),
       guessHistory: guessHistoryCopy
     };
@@ -540,6 +743,9 @@ class NumberGuessingGame {
     
     if (games.length === 0) {
       historyDisplay.innerHTML = '<p>No games played yet.</p>';
+      this.historyVisible = true;
+      const viewBtn = document.getElementById('viewHistory');
+      if (viewBtn) viewBtn.textContent = 'Hide All Games';
       return;
     }
 
@@ -576,6 +782,9 @@ class NumberGuessingGame {
     `;
 
     historyDisplay.innerHTML = historyHTML;
+    this.historyVisible = true;
+    const viewBtn = document.getElementById('viewHistory');
+    if (viewBtn) viewBtn.textContent = 'Hide All Games';
     
     // Add click listeners to table rows
     const rows = historyDisplay.querySelectorAll('.history-row');
@@ -610,7 +819,9 @@ class NumberGuessingGame {
     const allGuesses = game.guessHistory.map(item => ({
       guess: item.guess,
       result: item.result,
-      count: item.count
+      count: item.count,
+      isPenalty: !!item.isPenalty,
+      isViolation: !!item.isViolation
     }));
     
     // Debug: Log to verify all guesses are present
@@ -625,15 +836,20 @@ class NumberGuessingGame {
     const guessesHTML = `
       <div class="selected-game-header">
         <h4>Game Details</h4>
-        <p><strong>Target Number:</strong> ${game.targetNumber} | <strong>Total Guesses:</strong> ${game.guessCount} | <strong>Date:</strong> ${new Date(game.timestamp).toLocaleString()}</p>
+        <p><strong>Target Number:</strong> ${game.targetNumber} | <strong>Total Guesses:</strong> ${game.guessCount} | <strong>Penalties:</strong> ${game.penaltyCount || 0} | <strong>Date:</strong> ${new Date(game.timestamp).toLocaleString()}</p>
         <p><strong>Guesses in History:</strong> ${game.guessHistory.length} | <strong>Displayed:</strong> ${allGuesses.length}</p>
       </div>
       <div class="selected-game-guess-list">
-        <strong>All Guesses (${game.guessCount} total):</strong>
+        <strong>All Guesses:</strong>
         <ul class="historical-guess-list">
-          ${allGuesses.map(item => 
-            `<li>Guess #${item.count}: ${item.guess} - ${item.result.replace(/\(Guess #\d+\)/g, '').trim()}</li>`
-          ).join('')}
+          ${allGuesses.map(item => {
+            const flags = [
+              item.isPenalty ? 'Penalty' : null,
+              item.isViolation ? 'Violation' : null
+            ].filter(Boolean);
+            const flagLabel = flags.length ? ` (${flags.join(', ')})` : '';
+            return `<li>Guess #${item.count}: ${item.guess}${flagLabel} - ${item.result.replace(/\(Guess #\d+\)/g, '').trim()}</li>`;
+          }).join('')}
         </ul>
       </div>
     `;
@@ -686,8 +902,29 @@ class NumberGuessingGame {
       this.startNewGame();
     });
 
+    document.getElementById('applyConditions').addEventListener('click', () => {
+      this.setConditionsEnabled(!this.conditionsEnabled);
+      // Keep this subtle; gameStatus will update on next guess, but give immediate feedback too.
+      this.updateStatus(
+        this.conditionsEnabled
+          ? 'Conditions enabled: invalid guesses will be penalized.'
+          : 'Conditions disabled.',
+        'hint'
+      );
+      document.getElementById('guessInput').focus();
+    });
+
     document.getElementById('viewHistory').addEventListener('click', () => {
-      this.loadGameHistory();
+      const historyDisplay = document.getElementById('historyDisplay');
+      if (this.historyVisible) {
+        // Hide history
+        historyDisplay.innerHTML = '';
+        this.historyVisible = false;
+        document.getElementById('viewHistory').textContent = 'View All Games';
+      } else {
+        // Show history
+        this.loadGameHistory();
+      }
     });
 
     document.getElementById('clearDatabase').addEventListener('click', () => {
