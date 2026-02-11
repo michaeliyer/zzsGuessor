@@ -1,0 +1,709 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NumberGuesserTwo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <h1>Zuuu Nuuu Number Guesser Two!</h1>
+
+
+    <div class="number-guesser-section">
+      <h2>Number Guessing Game (1-1000)</h2>
+      <div class="game-container">
+        <p id="gameStatus">Guess a number between 1 and 1000!</p>
+        <div class="input-group">
+          <input type="number" id="guessInput" min="1" max="1000" placeholder="Enter your guess">
+          <button id="submitGuess">Guess</button>
+          <button id="newGame">New Game</button>
+        </div>
+        <div id="guessHistory" class="guess-history"></div>
+        <div class="game-stats">
+          <p>Guesses: <span id="guessCount">0</span></p>
+        </div>
+        <div class="game-history-section">
+          <h3>Game History</h3>
+          <div class="history-buttons">
+            <button id="viewHistory">View All Games</button>
+            <button id="clearDatabase">Clear Database</button>
+          </div>
+          <div id="historyDisplay" class="history-display"></div>
+        </div>
+      </div>
+    </div>
+<style>
+  body {
+    background-color: gray;
+}
+h1 {
+    background-color: rgb(42, 2, 2);
+    color: blueviolet;
+}
+
+/* Number Guessing Game Styles */
+.number-guesser-section {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.number-guesser-section h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#gameStatus {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #e3f2fd;
+}
+
+#gameStatus.success {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+#gameStatus.error {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+#gameStatus.hint {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#guessInput {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+#guessInput:focus {
+    outline: none;
+    border-color: #4caf50;
+}
+
+#submitGuess,
+#newGame {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#submitGuess {
+    background-color: #4caf50;
+    color: white;
+}
+
+#submitGuess:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+#submitGuess:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#newGame {
+    background-color: #2196f3;
+    color: white;
+}
+
+#newGame:hover {
+    background-color: #0b7dda;
+}
+
+.guess-history {
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    min-height: 50px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.guess-history ul {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+}
+
+.guess-history li {
+    margin: 5px 0;
+}
+
+.active-guess-list {
+    max-height: 250px;
+    overflow-y: auto;
+    list-style-type: decimal;
+}
+
+.active-guess-list li {
+    margin: 8px 0;
+    padding: 5px;
+    background-color: #f9f9f9;
+    border-radius: 3px;
+}
+
+.game-stats {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.game-history-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+.game-history-section h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.history-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+#viewHistory,
+#clearDatabase {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#viewHistory {
+    background-color: #ff9800;
+    color: white;
+}
+
+#viewHistory:hover {
+    background-color: #f57c00;
+}
+
+#clearDatabase {
+    background-color: #f44336;
+    color: white;
+}
+
+#clearDatabase:hover {
+    background-color: #d32f2f;
+}
+
+.history-display {
+    margin-top: 15px;
+}
+
+.history-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.history-stats p {
+    margin: 5px 0;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.history-table thead {
+    background-color: #2196f3;
+    color: white;
+}
+
+.history-table th,
+.history-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.history-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.history-table tbody tr.selected {
+    background-color: #e3f2fd !important;
+    font-weight: bold;
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.selected-game-guesses {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 2px solid #2196f3;
+}
+
+.selected-game-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.selected-game-header h4 {
+    margin: 0 0 10px 0;
+    color: #2196f3;
+}
+
+.selected-game-header p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.selected-game-guess-list {
+    margin-top: 10px;
+}
+
+.historical-guess-list {
+    max-height: 200px;
+    overflow-y: auto;
+    list-style-type: decimal;
+    margin: 10px 0;
+    padding-left: 25px;
+    background-color: #f9f9f9;
+    padding: 10px 10px 10px 25px;
+    border-radius: 5px;
+}
+
+.historical-guess-list li {
+    margin: 8px 0;
+    padding: 5px;
+    background-color: white;
+    border-radius: 3px;
+}
+
+.more-guesses-note {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    margin-top: 10px;
+}
+</style>
+
+
+<script>
+      // Number Guessing Game with IndexedDB
+class NumberGuessingGame {
+  constructor() {
+    this.targetNumber = null;
+    this.guessCount = 0;
+    this.guessHistory = [];
+    this.db = null;
+    this.init();
+  }
+
+  async init() {
+    await this.initDB();
+    this.setupEventListeners();
+    this.startNewGame();
+  }
+
+  // Initialize IndexedDB
+  initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('NumberGuessingGameDB', 1);
+
+      request.onerror = () => {
+        console.error('IndexedDB error:', request.error);
+        reject(request.error);
+      };
+
+      request.onsuccess = () => {
+        this.db = request.result;
+        console.log('IndexedDB initialized');
+        resolve();
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('games')) {
+          const objectStore = db.createObjectStore('games', {
+            keyPath: 'id',
+            autoIncrement: true
+          });
+          objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+          objectStore.createIndex('guessCount', 'guessCount', { unique: false });
+        }
+      };
+    });
+  }
+
+  // Start a new game
+  startNewGame() {
+    this.targetNumber = Math.floor(Math.random() * 1000) + 1;
+    this.guessCount = 0;
+    this.guessHistory = [];
+    this.updateUI();
+    document.getElementById('guessInput').value = '';
+    document.getElementById('guessInput').disabled = false;
+    document.getElementById('submitGuess').disabled = false;
+    console.log('New game started. Target number:', this.targetNumber);
+  }
+
+  // Handle guess submission
+  handleGuess() {
+    const input = document.getElementById('guessInput');
+    const guess = parseInt(input.value);
+
+    if (isNaN(guess) || guess < 1 || guess > 1000) {
+      this.updateStatus('Please enter a valid number between 1 and 1000!', 'error');
+      return;
+    }
+
+    // Check if this number has already been guessed
+    const alreadyGuessed = this.guessHistory.some(item => item.guess === guess);
+    if (alreadyGuessed) {
+      this.updateStatus(`You've already guessed ${guess}! Try a different number.`, 'error');
+      input.value = '';
+      input.focus();
+      return;
+    }
+
+    this.guessCount++;
+    // Update guess count display
+    document.getElementById('guessCount').textContent = this.guessCount;
+    
+    let message = '';
+    let statusClass = '';
+
+    if (guess === this.targetNumber) {
+      message = `🎉 Congratulations! You guessed it in ${this.guessCount} ${this.guessCount === 1 ? 'guess' : 'guesses'}!`;
+      statusClass = 'success';
+      input.disabled = true;
+      document.getElementById('submitGuess').disabled = true;
+    } else if (guess < this.targetNumber) {
+      message = `Higher! (Guess #${this.guessCount})`;
+      statusClass = 'hint';
+    } else {
+      message = `Lower! (Guess #${this.guessCount})`;
+      statusClass = 'hint';
+    }
+
+    // Add guess to history BEFORE saving (so final guess is included)
+    this.guessHistory.push({ guess, result: message, count: this.guessCount });
+    this.updateStatus(message, statusClass);
+    this.updateGuessHistory();
+    
+    // Save game after adding the final guess to history
+    if (guess === this.targetNumber) {
+      this.saveGame();
+    }
+    
+    input.value = '';
+    input.focus();
+  }
+
+  // Update status message
+  updateStatus(message, className = '') {
+    const statusEl = document.getElementById('gameStatus');
+    statusEl.textContent = message;
+    statusEl.className = className;
+  }
+
+  // Update guess count display
+  updateUI() {
+    document.getElementById('guessCount').textContent = this.guessCount;
+    this.updateStatus('Guess a number between 1 and 1000!');
+    this.updateGuessHistory();
+  }
+
+  // Update guess history display (shows all guesses during active session)
+  updateGuessHistory() {
+    const historyEl = document.getElementById('guessHistory');
+    if (this.guessHistory.length === 0) {
+      historyEl.innerHTML = '';
+      return;
+    }
+
+    // Show all guesses during active session, most recent first
+    const allGuesses = [...this.guessHistory].reverse();
+    historyEl.innerHTML = '<strong>All Guesses (Active Game):</strong><ul class="active-guess-list">' +
+      allGuesses.map(item => 
+        `<li>Guess #${item.count}: ${item.guess} - ${item.result.replace(/\(Guess #\d+\)/g, '').trim()}</li>`
+      ).join('') + '</ul>';
+  }
+
+  // Save game to IndexedDB
+  saveGame() {
+    if (!this.db) {
+      console.error('Database not initialized');
+      return;
+    }
+
+    // Create a deep copy of guessHistory to ensure all data is saved
+    const guessHistoryCopy = this.guessHistory.map(item => ({
+      guess: item.guess,
+      result: item.result,
+      count: item.count
+    }));
+
+    console.log('Saving game - guessCount:', this.guessCount);
+    console.log('Saving game - guessHistory length:', this.guessHistory.length);
+    console.log('Saving game - guessHistory:', this.guessHistory);
+    console.log('Saving game - guessHistoryCopy length:', guessHistoryCopy.length);
+
+    const gameData = {
+      targetNumber: this.targetNumber,
+      guessCount: this.guessCount,
+      timestamp: new Date().toISOString(),
+      guessHistory: guessHistoryCopy
+    };
+
+    const transaction = this.db.transaction(['games'], 'readwrite');
+    const objectStore = transaction.objectStore('games');
+    const request = objectStore.add(gameData);
+
+    request.onsuccess = () => {
+      console.log('Game saved to IndexedDB with', guessHistoryCopy.length, 'guesses');
+    };
+
+    request.onerror = () => {
+      console.error('Error saving game:', request.error);
+    };
+  }
+
+  // Load and display game history
+  async loadGameHistory() {
+    if (!this.db) {
+      console.error('Database not initialized');
+      return;
+    }
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction(['games'], 'readonly');
+      const objectStore = transaction.objectStore('games');
+      const request = objectStore.getAll();
+
+      request.onsuccess = () => {
+        const games = request.result;
+        this.displayHistory(games);
+        resolve(games);
+      };
+
+      request.onerror = () => {
+        console.error('Error loading history:', request.error);
+        reject(request.error);
+      };
+    });
+  }
+
+  // Display game history
+  displayHistory(games) {
+    const historyDisplay = document.getElementById('historyDisplay');
+    
+    if (games.length === 0) {
+      historyDisplay.innerHTML = '<p>No games played yet.</p>';
+      return;
+    }
+
+    // Sort by timestamp (newest first)
+    games.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    const historyHTML = `
+      <div class="history-stats">
+        <p><strong>Total Games:</strong> ${games.length}</p>
+        <p><strong>Average Guesses:</strong> ${(games.reduce((sum, g) => sum + g.guessCount, 0) / games.length).toFixed(2)}</p>
+        <p><strong>Best Score:</strong> ${Math.min(...games.map(g => g.guessCount))} guesses</p>
+      </div>
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Game #</th>
+            <th>Target</th>
+            <th>Guesses</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${games.map((game, index) => `
+            <tr class="history-row" data-game-id="${game.id || index}" data-game-index="${index}">
+              <td>${games.length - index}</td>
+              <td>${game.targetNumber}</td>
+              <td>${game.guessCount}</td>
+              <td>${new Date(game.timestamp).toLocaleString()}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div id="selectedGameGuesses" class="selected-game-guesses"></div>
+    `;
+
+    historyDisplay.innerHTML = historyHTML;
+    
+    // Add click listeners to table rows
+    const rows = historyDisplay.querySelectorAll('.history-row');
+    rows.forEach(row => {
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', () => {
+        const gameIndex = parseInt(row.dataset.gameIndex);
+        this.displayGameGuesses(games[gameIndex]);
+        // Highlight selected row
+        rows.forEach(r => r.classList.remove('selected'));
+        row.classList.add('selected');
+      });
+    });
+  }
+
+  // Display guesses for a selected historical game
+  displayGameGuesses(game) {
+    const selectedGameGuesses = document.getElementById('selectedGameGuesses');
+    
+    if (!game) {
+      selectedGameGuesses.innerHTML = '<p>No game data available.</p>';
+      return;
+    }
+
+    if (!game.guessHistory || game.guessHistory.length === 0) {
+      selectedGameGuesses.innerHTML = '<p>No guess history available for this game.</p>';
+      return;
+    }
+
+    // Show all guesses in chronological order (oldest first, newest last)
+    // Create a fresh array to ensure we have all items
+    const allGuesses = game.guessHistory.map(item => ({
+      guess: item.guess,
+      result: item.result,
+      count: item.count
+    }));
+    
+    // Debug: Log to verify all guesses are present
+    console.log('Displaying game - guessCount:', game.guessCount);
+    console.log('Displaying game - guessHistory length:', game.guessHistory.length);
+    console.log('Displaying game - allGuesses length:', allGuesses.length);
+    console.log('Displaying game - allGuesses:', allGuesses);
+    
+    // Sort by count to ensure correct order (in case they're not in order)
+    allGuesses.sort((a, b) => a.count - b.count);
+    
+    const guessesHTML = `
+      <div class="selected-game-header">
+        <h4>Game Details</h4>
+        <p><strong>Target Number:</strong> ${game.targetNumber} | <strong>Total Guesses:</strong> ${game.guessCount} | <strong>Date:</strong> ${new Date(game.timestamp).toLocaleString()}</p>
+        <p><strong>Guesses in History:</strong> ${game.guessHistory.length} | <strong>Displayed:</strong> ${allGuesses.length}</p>
+      </div>
+      <div class="selected-game-guess-list">
+        <strong>All Guesses (${game.guessCount} total):</strong>
+        <ul class="historical-guess-list">
+          ${allGuesses.map(item => 
+            `<li>Guess #${item.count}: ${item.guess} - ${item.result.replace(/\(Guess #\d+\)/g, '').trim()}</li>`
+          ).join('')}
+        </ul>
+      </div>
+    `;
+
+    selectedGameGuesses.innerHTML = guessesHTML;
+  }
+
+  // Clear all games from IndexedDB
+  clearDatabase() {
+    if (!this.db) {
+      console.error('Database not initialized');
+      return;
+    }
+
+    const confirmed = confirm('Are you sure you want to delete all game history? This action cannot be undone.');
+    
+    if (!confirmed) {
+      return;
+    }
+
+    const transaction = this.db.transaction(['games'], 'readwrite');
+    const objectStore = transaction.objectStore('games');
+    const request = objectStore.clear();
+
+    request.onsuccess = () => {
+      console.log('Database cleared');
+      document.getElementById('historyDisplay').innerHTML = '<p>No games played yet.</p>';
+      alert('All game history has been deleted.');
+    };
+
+    request.onerror = () => {
+      console.error('Error clearing database:', request.error);
+      alert('Error clearing database. Please try again.');
+    };
+  }
+
+  // Setup event listeners
+  setupEventListeners() {
+    document.getElementById('submitGuess').addEventListener('click', () => {
+      this.handleGuess();
+    });
+
+    document.getElementById('guessInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.handleGuess();
+      }
+    });
+
+    document.getElementById('newGame').addEventListener('click', () => {
+      this.startNewGame();
+    });
+
+    document.getElementById('viewHistory').addEventListener('click', () => {
+      this.loadGameHistory();
+    });
+
+    document.getElementById('clearDatabase').addEventListener('click', () => {
+      this.clearDatabase();
+    });
+  }
+}
+
+// Initialize the game when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    new NumberGuessingGame();
+  });
+} else {
+  new NumberGuessingGame();
+}
+    </script>
+  </body>
+</html>
